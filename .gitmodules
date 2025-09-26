@@ -1,6 +1,6 @@
 [submodule "src/third_party/MuQ"]
 	path = src/third_party/MuQ
 	url = https://github.com/tencent-ailab/MuQ.git
-[submodule "src/third_party/MusicFM"]
-	path = src/third_party/MusicFM
+[submodule "src/third_party/musicfm"]
+	path = src/third_party/musicfm
 	url = https://github.com/minzwon/musicfm.git
