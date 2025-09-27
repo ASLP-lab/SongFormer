@@ -1,0 +1,52 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+# Python IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data files (data used for training or testing)
+*.log
+
+# TensorBoard logs
+runs/
+tensorboard_logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# PyCharm files
+*.iml
+.idea/
+
+# Coverage and testing tools
+.coverage
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Compiled extension modules
+*.so
+*.dylib
+*.pyd
+
+# Cython debug symbols
+cython_debug/
+
+# Other custom ignore rules
+*.bak
+*.swp
