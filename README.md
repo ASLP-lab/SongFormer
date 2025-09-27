@@ -1,6 +1,7 @@
-<div style="text-align: center;">
+<p align="center">
   <img src="figs/logo.png" width="50%" />
-</div>
+</p>
+
 
 # SONGFORMER: SCALING MUSIC STRUCTURE ANALYSIS WITH HETEROGENEOUS SUPERVISION
 
@@ -15,7 +16,8 @@
 [![Discord](https://img.shields.io/badge/Discord-join%20us-purple?logo=discord&logoColor=white)](https://discord.gg/rwcqh7Em)
 [![lab](https://img.shields.io/badge/🏫-ASLP-grey?labelColor=lightgrey)](http://www.npu-aslp.org/)
 
-Chunbo Hao$^{\star}$, Ruibin Yuan$^{\star}$, Jixun Yao, Qixin Deng, Xinyi Bai, Wei Xue, Lei Xie$^{\dagger}$
+Chunbo Hao<sup>&ast;</sup>, Ruibin Yuan<sup>&ast;</sup>, Jixun Yao, Qixin Deng, Xinyi Bai, Wei Xue, Lei Xie<sup>&dagger;</sup>
+
 
 ----
 
