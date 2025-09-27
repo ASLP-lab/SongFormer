@@ -77,7 +77,7 @@ Our code is released under CC-BY-4.0 License.
 
 ## Contact Us
 
-If you are interested in leaving a message to our research team, feel free to email `nzqiann@gmail.com`.
+
 <p align="center">
     <a href="http://www.nwpu-aslp.org/">
         <img src="figs/aslp.png" width="400"/>
