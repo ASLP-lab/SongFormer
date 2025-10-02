@@ -5,10 +5,15 @@ os.chdir(os.path.join("src", "SongFormer"))
 sys.path.append(os.path.join("..", "third_party"))
 sys.path.append(".")
 
+# monkey patch to fix issues in msaf
+import scipy
+import numpy as np
+
+scipy.inf = np.inf
+
 import gradio as gr
 import torch
 import librosa
-import numpy as np
 import json
 import math
 import importlib
@@ -22,6 +27,7 @@ from muq import MuQ
 from musicfm.model.musicfm_25hz import MusicFM25Hz
 from postprocessing.functional import postprocess_functional_structure
 from dataset.label2id import DATASET_ID_ALLOWED_LABEL_IDS, DATASET_LABEL_TO_DATASET_ID
+from utils.fetch_pretrained import download_all
 
 # Constants
 MUSICFM_HOME_PATH = os.path.join("ckpts", "MusicFM")
@@ -40,16 +46,22 @@ device = None
 
 
 def load_checkpoint(checkpoint_path, device=None):
-    if device:
+    """Load checkpoint from path"""
+    if device is None:
+        device = "cpu"
+
+    if checkpoint_path.endswith(".pt"):
         checkpoint = torch.load(checkpoint_path, map_location=device)
+    elif checkpoint_path.endswith(".safetensors"):
+        from safetensors.torch import load_file
+
+        checkpoint = {"model_ema": load_file(checkpoint_path, device=device)}
     else:
-        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+        raise ValueError("Unsupported checkpoint format. Use .pt or .safetensors")
     return checkpoint
 
 
-def initialize_models(
-    model_name="SongFormer", checkpoint="SongFormer.pt", config_path="SongFormer.yaml"
-):
+def initialize_models(model_name: str, checkpoint: str, config_path: str):
     """Initialize all models"""
     global muq_model, musicfm_model, msa_model, device
 
@@ -259,8 +271,8 @@ def format_as_segments(msa_output):
     for idx in range(len(msa_output) - 1):
         segments.append(
             {
-                "start": round(msa_output[idx][0], 2),
-                "end": round(msa_output[idx + 1][0], 2),
+                "start": str(round(msa_output[idx][0], 2)),
+                "end": str(round(msa_output[idx + 1][0], 2)),
                 "label": msa_output[idx][1],
             }
         )
@@ -343,22 +355,73 @@ def create_visualization(
     return fig
 
 
+def rule_post_processing(msa_list):
+    if len(msa_list) <= 2:
+        return msa_list
+
+    result = msa_list.copy()
+
+    while len(result) > 2:
+        first_duration = result[1][0] - result[0][0]
+        if first_duration < 1.0 and len(result) > 2:
+            result[0] = (result[0][0], result[1][1])
+            result = [result[0]] + result[2:]
+        else:
+            break
+
+    while len(result) > 2:
+        last_label_duration = result[-1][0] - result[-2][0]
+        if last_label_duration < 1.0:
+            result = result[:-2] + [result[-1]]
+        else:
+            break
+
+    while len(result) > 2:
+        if result[0][1] == result[1][1] and result[1][0] <= 10.0:
+            result = [(result[0][0], result[0][1])] + result[2:]
+        else:
+            break
+
+    while len(result) > 2:
+        last_duration = result[-1][0] - result[-2][0]
+        if result[-2][1] == result[-3][1] and last_duration <= 10.0:
+            result = result[:-2] + [result[-1]]
+        else:
+            break
+
+    return result
+
+
 def process_and_analyze(audio_file):
     """Main processing function"""
+
+    def format_time(t: float) -> str:
+        minutes = int(t // 60)
+        seconds = t % 60
+        return f"{minutes:02d}:{seconds:06.3f}"  # 这个格式是正确的
+
     if audio_file is None:
         return None, "", "", None
 
     try:
         # Process audio
         logits, msa_output = process_audio(audio_file)
-
+        # Apply rule-based post-processing, if not needed, use in cli infer
+        msa_output = rule_post_processing(msa_output)
         # Format outputs
         segments = format_as_segments(msa_output)
         msa_format = format_as_msa(msa_output)
         json_format = format_as_json(segments)
 
         # Create table data
-        table_data = [[seg["start"], seg["end"], seg["label"]] for seg in segments]
+        table_data = [
+            [
+                f"{float(seg['start']):.2f} ({format_time(float(seg['start']))})",
+                f"{float(seg['end']):.2f} ({format_time(float(seg['end']))})",
+                seg["label"],
+            ]
+            for seg in segments
+        ]
 
         # Create visualization
         fig = create_visualization(logits, msa_output)
@@ -366,7 +429,11 @@ def process_and_analyze(audio_file):
         return table_data, json_format, msa_format, fig
 
     except Exception as e:
-        return None, "", f"Error: {str(e)}", None
+        import traceback
+
+        error_msg = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # 在命令行输出完整错误
+        return None, "", error_msg, None
 
 
 # Create Gradio interface
@@ -393,8 +460,15 @@ with gr.Blocks(
 ) as demo:
     # Top Logo
     gr.HTML("""
-        <div class="logo-container">
-            <img src="../../figs/logo.png" alt="Logo" style="max-width: 300px; height: auto;">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="https://raw.githubusercontent.com/ASLP-lab/SongFormer/refs/heads/main/figs/logo.png" style="max-width: 300px; height: auto;" />
+        </div>
+    """)
+
+    # Model title
+    gr.HTML("""
+        <div class="model-title">
+            SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision
         </div>
     """)
 
@@ -430,13 +504,6 @@ with gr.Blocks(
         </div>
     """)
 
-    # Model title
-    gr.HTML("""
-        <div class="model-title">
-            SONGFORMER: SCALING MUSIC STRUCTURE ANALYSIS WITH HETEROGENEOUS SUPERVISION
-        </div>
-    """)
-
     # Main input area
     with gr.Row():
         with gr.Column(scale=3):
@@ -464,38 +531,42 @@ with gr.Blocks(
 
     # Results display area
     with gr.Row():
-        segments_table = gr.Dataframe(
-            headers=["Start (s)", "End (s)", "Label"],
-            label="Detected Music Segments",
-            interactive=False,
-            elem_id="result-table",
-        )
+        with gr.Column(scale=13):
+            segments_table = gr.Dataframe(
+                headers=["Start / s (m:s.ms)", "End / s (m:s.ms)", "Label"],
+                label="Detected Music Segments",
+                interactive=False,
+                elem_id="result-table",
+            )
+        with gr.Column(scale=8):
+            with gr.Row():
+                with gr.Accordion("📄 JSON Output", open=False):
+                    json_output = gr.Textbox(
+                        label="JSON Format",
+                        lines=15,
+                        max_lines=20,
+                        interactive=False,
+                        show_copy_button=True,
+                    )
+            with gr.Row():
+                with gr.Accordion("📋 MSA Text Output", open=False):
+                    msa_output = gr.Textbox(
+                        label="MSA Format",
+                        lines=15,
+                        max_lines=20,
+                        interactive=False,
+                        show_copy_button=True,
+                    )
 
     # Visualization plot
     with gr.Row():
         plot_output = gr.Plot(label="Activation Curves Visualization")
 
-    # Bottom text output area - left/right columns
-    with gr.Row():
-        with gr.Column():
-            with gr.Accordion("📄 JSON Output", open=False):
-                json_output = gr.Textbox(
-                    label="JSON Format",
-                    lines=15,
-                    max_lines=20,
-                    interactive=False,
-                    show_copy_button=True,
-                )
-
-        with gr.Column():
-            with gr.Accordion("📋 MSA Text Output", open=False):
-                msa_output = gr.Textbox(
-                    label="MSA Format",
-                    lines=15,
-                    max_lines=20,
-                    interactive=False,
-                    show_copy_button=True,
-                )
+    gr.HTML("""
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="https://raw.githubusercontent.com/ASLP-lab/SongFormer/refs/heads/main/figs/aslp.png" style="max-width: 300px; height: auto;" />
+        </div>
+    """)
 
     # Set event handlers
     analyze_btn.click(
@@ -505,10 +576,16 @@ with gr.Blocks(
     )
 
 if __name__ == "__main__":
+    # Download pretrained models if not exist
+    download_all(use_mirror=False)
     # Initialize models
     print("Initializing models...")
-    initialize_models()
+    initialize_models(
+        model_name="SongFormer",
+        checkpoint="SongFormer.safetensors",
+        config_path="SongFormer.yaml",
+    )
     print("Models loaded successfully!")
 
     # Launch interface
-    demo.launch(server_name="127.0.0.1", server_port=7891)
+    demo.launch(server_name="127.0.0.1", server_port=7891, debug=True)

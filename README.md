@@ -30,10 +30,10 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 
 ## 📋 To-Do List
 
-- [ ] Complete and push inference code to GitHub
-- [ ] Upload model checkpoint(s) to Hugging Face Hub
+- [x] Complete and push inference code to GitHub
+- [x] Upload model checkpoint(s) to Hugging Face Hub
 - [ ] Upload the paper to arXiv
-- [ ] Fix readme
+- [x] Fix readme
 - [ ] Deploy an out-of-the-box inference version on Hugging Face (via Inference API or Spaces)
 - [ ] Publish the package to PyPI for easy installation via `pip`
 - [ ] Open-source evaluation code
@@ -41,21 +41,105 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 
 ## Installation
 
-comming soon
+### Setting up Python Environment
+
+```bash
+git clone https://github.com/ASLP-lab/SongFormer.git
+
+# Get MuQ and MusicFM source code
+git submodule update --init --recursive
+
+conda create -n songformer python=3.10 -y
+conda activate songformer
+```
+
+For users in mainland China, you may need to set up pip mirror source:
+
+```bash
+pip config set global.index-url https://pypi.mirrors.ustc.edu.cn/simple
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+We tested this on Ubuntu 22.04.1 LTS and it works normally. If you cannot install, you may need to remove version constraints in `requirements.txt`
+
+### Download Pre-trained Models
+
+```bash
+cd src/SongFormer
+# For users in mainland China, you can modify according to the py file instructions to use hf-mirror.com for downloading
+python utils/fetch_pretrained.py
+```
+
+After downloading, you can verify the md5sum values in `src/SongFormer/ckpts/MusicFM/md5sum.txt` match the downloaded files:
+
+```bash
+md5sum ckpts/MusicFM/msd_stats.json
+md5sum ckpts/MusicFM/pretrained_msd.pt
+md5sum ckpts/SongFormer.safetensors
+# md5sum ckpts/SongFormer.pt
+```
 
 ## Inference
 
-### 1. Gradio App
+## Inference
 
-comming soon
+### 1. One-Click Inference with HuggingFace Space (coming soon)
 
-### 2. CLI Inference
+Available at: [https://huggingface.co/spaces/ASLP-lab/SongFormer](https://huggingface.co/spaces/ASLP-lab/SongFormer)
 
-comming soon
+### 2. Gradio App
 
-### 3. Python API
+First, cd to the project root directory and activate the environment:
 
-comming soon
+```bash
+conda activate songformer
+```
+
+You can modify the server port and listening address in the last line of `app.py` according to your preference.
+
+> If you're using an HTTP proxy, please ensure you include:
+>
+> ```bash
+> export no_proxy="localhost, 127.0.0.1, ::1"
+> export NO_PROXY="localhost, 127.0.0.1, ::1"
+> ```
+>
+> Otherwise, Gradio may incorrectly assume the service hasn't started, causing startup to exit directly.
+
+When first running `app.py`, it will connect to Hugging Face to download MuQ-related weights. We recommend creating an empty folder in an appropriate location and using `export HF_HOME=XXX` to point to this folder, so cache will be stored there for easy cleanup and transfer.
+
+And for users in mainland China, you may need `export HF_ENDPOINT=https://hf-mirror.com`. For details, refer to https://hf-mirror.com/
+
+```bash
+python app.py
+```
+
+### 3. Python Code
+
+You can refer to the file `src/SongFormer/infer/infer.py`. The corresponding execution script is located at `src/SongFormer/infer.sh`. This is a ready-to-use, single-machine, multi-process annotation script.
+
+Below are some configurable parameters from the `src/SongFormer/infer.sh` script. You can set `CUDA_VISIBLE_DEVICES` to specify which GPUs to use:
+
+```bash
+-i              # Input SCP folder path, each line containing the absolute path to one audio file
+-o              # Output directory for annotation results
+--model         # Annotation model; the default is 'SongFormer', change if using a fine-tuned model
+--checkpoint    # Path to the model checkpoint file
+--config_pat    # Path to the configuration file
+-gn             # Total number of GPUs to use — should match the number specified in CUDA_VISIBLE_DEVICES
+-tn             # Number of processes to run per GPU
+```
+
+You can control which GPUs are used by setting the `CUDA_VISIBLE_DEVICES` environment variable.
+
+### 4. CLI Inference
+
+Coming soon
 
 ### 4. Pitfall
 

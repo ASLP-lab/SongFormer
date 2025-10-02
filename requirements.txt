@@ -79,3 +79,8 @@ beartype==0.21.0
 triton==3.0.0
 muq==0.1.0
 vmo==0.30.5
+
+# others
+gradio
+einops
+beartype

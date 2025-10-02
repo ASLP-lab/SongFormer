@@ -8,8 +8,13 @@ import time
 from argparse import Namespace
 from pathlib import Path
 
-import librosa
+# monkey patch to fix issues in msaf
+import scipy
 import numpy as np
+
+scipy.inf = np.inf
+
+import librosa
 import torch
 from ema_pytorch import EMA
 from loguru import logger
@@ -56,12 +61,56 @@ def get_processing_ids(input_path, processed_ids_set):
 
 
 def load_checkpoint(checkpoint_path, device=None):
-    """Load the model checkpoint from file"""
-    if device:
+    """Load checkpoint from path"""
+    if device is None:
+        device = "cpu"
+
+    if checkpoint_path.endswith(".pt"):
         checkpoint = torch.load(checkpoint_path, map_location=device)
+    elif checkpoint_path.endswith(".safetensors"):
+        from safetensors.torch import load_file
+
+        checkpoint = {"model_ema": load_file(checkpoint_path, device=device)}
     else:
-        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+        raise ValueError("Unsupported checkpoint format. Use .pt or .safetensors")
     return checkpoint
+
+
+def rule_post_processing(msa_list):
+    if len(msa_list) <= 2:
+        return msa_list
+
+    result = msa_list.copy()
+
+    while len(result) > 2:
+        first_duration = result[1][0] - result[0][0]
+        if first_duration < 1.0 and len(result) > 2:
+            result[0] = (result[0][0], result[1][1])
+            result = [result[0]] + result[2:]
+        else:
+            break
+
+    while len(result) > 2:
+        last_label_duration = result[-1][0] - result[-2][0]
+        if last_label_duration < 1.0:
+            result = result[:-2] + [result[-1]]
+        else:
+            break
+
+    while len(result) > 2:
+        if result[0][1] == result[1][1] and result[1][0] <= 10.0:
+            result = [(result[0][0], result[0][1])] + result[2:]
+        else:
+            break
+
+    while len(result) > 2:
+        last_duration = result[-1][0] - result[-2][0]
+        if result[-2][1] == result[-3][1] and last_duration <= 10.0:
+            result = result[:-2] + [result[-1]]
+        else:
+            break
+
+    return result
 
 
 def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
@@ -259,7 +308,8 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
                 msa_infer_output = postprocess_functional_structure(logits, hp)
 
                 assert msa_infer_output[-1][-1] == "end"
-
+                if not args.no_rule_post_processing:
+                    msa_infer_output = rule_post_processing(msa_infer_output)
                 msa_json = []
                 for idx in range(len(msa_infer_output) - 1):
                     msa_json.append(
@@ -317,6 +367,7 @@ def main(args):
         model=args.model,
         checkpoint=args.checkpoint,
         config_path=args.config_path,
+        no_rule_post_processing=args.no_rule_post_processing,
     )
 
     processes = []
@@ -376,6 +427,11 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, help="Model to use")
     parser.add_argument("--checkpoint", type=str, help="Checkpoint path")
     parser.add_argument("--config_path", type=str, help="Configuration file path")
+    parser.add_argument(
+        "--no_rule_post_processing",
+        action="store_true",
+        help="Disable rule-based post-processing",
+    )
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
     args = parser.parse_args()

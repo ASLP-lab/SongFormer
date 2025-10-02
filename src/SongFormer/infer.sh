@@ -13,8 +13,9 @@ python infer/infer.py \
 -i XXX.scp \
 -o XXX_dir \
 --model SongFormer \
---checkpoint SongFormer.pt \
+--checkpoint SongFormer.safetensors \
 --config_path SongFormer.yaml \
 -gn 1 \
 -tn 1
 # --debug
+# --no_rule_post_processing
