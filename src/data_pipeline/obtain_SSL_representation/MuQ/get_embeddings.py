@@ -1,4 +1,3 @@
-# source /home/environment2/cbhao/miniconda3/bin/activate svc
 import torch
 import librosa
 from muq import MuQ
@@ -122,8 +121,8 @@ def main(args):
     init_args = Namespace(
         output_dir=output_path,
         sampling_rate=24000,
-        win_size=30,
-        hop_size=30,
+        win_size=420,
+        hop_size=420,
     )
 
     processes = []

@@ -134,7 +134,7 @@ def main(args):
     queue_input: mp.Queue = mp.Queue()
     queue_output: mp.Queue = mp.Queue()
 
-    init_args = Namespace(output_path=output_path, win_size=30, hop_size=30)
+    init_args = Namespace(output_path=output_path, win_size=420, hop_size=420)
 
     processes = []
 
