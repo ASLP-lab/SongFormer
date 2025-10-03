@@ -3,18 +3,18 @@
 </p>
 
 
-# SONGFORMER: SCALING MUSIC STRUCTURE ANALYSIS WITH HETEROGENEOUS SUPERVISION
-
-![Python](https://img.shields.io/badge/Python-3.10-brightgreen)  
-![License](https://img.shields.io/badge/License-CC%20BY%204.0-lightblue)  
-[![arXiv](https://img.shields.io/badge/arXiv-com.svg?logo=arXiv)]()  
-[![GitHub](https://img.shields.io/badge/GitHub-SongFormer-black)](https://github.com/ASLP-lab/SongFormer)  
-[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-space-yellow)](https://huggingface.co/spaces/ASLP-lab/SongFormer)  
-[![HuggingFace Model](https://img.shields.io/badge/HuggingFace-model-blue)](https://huggingface.co/ASLP-lab/SongFormer)  
-[![Dataset SongFormDB](https://img.shields.io/badge/HF%20Dataset-SongFormDB-green)](https://huggingface.co/datasets/ASLP-lab/SongFormDB)  
-[![Dataset SongFormBench](https://img.shields.io/badge/HF%20Dataset-SongFormBench-orange)](https://huggingface.co/datasets/ASLP-lab/SongFormBench)
-[![Discord](https://img.shields.io/badge/Discord-join%20us-purple?logo=discord&logoColor=white)](https://discord.gg/rwcqh7Em)
-[![lab](https://img.shields.io/badge/🏫-ASLP-grey?labelColor=lightgrey)](http://www.npu-aslp.org/)
+# SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-brightgreen"/>
+  <img src="https://img.shields.io/badge/License-CC%20BY%204.0-lightblue"/>
+  <a href="https://github.com/ASLP-lab/SongFormer"><img src="https://img.shields.io/badge/GitHub-SongFormer-black"/></a>
+  <a href="https://huggingface.co/spaces/ASLP-lab/SongFormer"><img src="https://img.shields.io/badge/HuggingFace-space-yellow"/></a>
+  <a href="https://huggingface.co/ASLP-lab/SongFormer"><img src="https://img.shields.io/badge/HuggingFace-model-blue"/></a>
+  <a href="https://huggingface.co/datasets/ASLP-lab/SongFormDB"><img src="https://img.shields.io/badge/HF%20Dataset-SongFormDB-green"/></a>
+  <a href="https://huggingface.co/datasets/ASLP-lab/SongFormBench"><img src="https://img.shields.io/badge/HF%20Dataset-SongFormBench-orange"/></a>
+  <a href="https://discord.gg/rwcqh7Em"><img src="https://img.shields.io/badge/Discord-join%20us-purple?logo=discord&logoColor=white"/></a>
+  <a href="http://www.npu-aslp.org/"><img src="https://img.shields.io/badge/🏫-ASLP-grey?labelColor=lightgrey"/></a>
+</p>
 
 Chunbo Hao<sup>&ast;</sup>, Ruibin Yuan<sup>&ast;</sup>, Jixun Yao, Qixin Deng, Xinyi Bai, Wei Xue, Lei Xie<sup>&dagger;</sup>
 
@@ -32,10 +32,9 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 
 - [x] Complete and push inference code to GitHub
 - [x] Upload model checkpoint(s) to Hugging Face Hub
-- [ ] Upload the paper to arXiv
+- [x] Upload the paper to arXiv
 - [x] Fix readme
-- [ ] Deploy an out-of-the-box inference version on Hugging Face (via Inference API or Spaces)
-- [ ] Publish the package to PyPI for easy installation via `pip`
+- [x] Deploy an out-of-the-box inference version on Hugging Face (via Inference API or Spaces)
 - [ ] Open-source evaluation code
 - [ ] Open-source training code
 
@@ -75,7 +74,7 @@ cd src/SongFormer
 python utils/fetch_pretrained.py
 ```
 
-After downloading, you can verify the md5sum values in `src/SongFormer/ckpts/MusicFM/md5sum.txt` match the downloaded files:
+After downloading, you can verify the md5sum values in `src/SongFormer/ckpts/md5sum.txt` match the downloaded files:
 
 ```bash
 md5sum ckpts/MusicFM/msd_stats.json
@@ -86,15 +85,13 @@ md5sum ckpts/SongFormer.safetensors
 
 ## Inference
 
-## Inference
-
-### 1. One-Click Inference with HuggingFace Space (coming soon)
+### 1. One-Click Inference with HuggingFace Space
 
 Available at: [https://huggingface.co/spaces/ASLP-lab/SongFormer](https://huggingface.co/spaces/ASLP-lab/SongFormer)
 
 ### 2. Gradio App
 
-First, cd to the project root directory and activate the environment:
+First, change directory to the project root directory and activate the environment:
 
 ```bash
 conda activate songformer
@@ -137,16 +134,13 @@ Below are some configurable parameters from the `src/SongFormer/infer.sh` script
 
 You can control which GPUs are used by setting the `CUDA_VISIBLE_DEVICES` environment variable.
 
-### 4. CLI Inference
-
-Coming soon
-
-### 4. Pitfall
-
-- You may need to modify line 121 in `src/third_party/musicfm/model/musicfm_25hz.py` to:
-`S = torch.load(model_path, weights_only=False)["state_dict"]`
+> Notes
+> - You may need to modify line 121 in `src/third_party/musicfm/model/musicfm_25hz.py` to:
+> `S = torch.load(model_path, weights_only=False)["state_dict"]`
 
 ## Training
+
+comming soon
 
 ## Citation
 
@@ -160,7 +154,12 @@ comming soon
 Our code is released under CC-BY-4.0 License.
 
 ## Contact Us
+We welcome your feedback and contributions! You can reach us through:
 
+- **Report Issues:** Found a bug or have a suggestion? Please open an issue directly in this GitHub repository. This is the best way to track and resolve problems.
+- **Join Our Community:** For discussions and real-time support, join our Discord server: https://discord.gg/rwcqh7Em
+
+We look forward to hearing from you!
 
 <p align="center">
     <a href="http://www.nwpu-aslp.org/">
