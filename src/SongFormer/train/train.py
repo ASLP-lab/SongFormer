@@ -4,6 +4,12 @@ import importlib
 import os
 import traceback
 
+# monkey patch to fix issues in msaf
+import scipy
+import numpy as np
+
+scipy.inf = np.inf
+
 import hydra
 import pandas as pd
 import torch
@@ -16,8 +22,8 @@ from ema_pytorch import EMA
 from encodec.balancer import Balancer
 from loguru import logger
 from omegaconf import OmegaConf
-from scripts.train.eval_infer_results_used_in_train import eval_infer_results
-from scripts.train.vis_infer_chunk_class_used_in_train import vis_infer_chunk
+from eval_infer_results_used_in_train import eval_infer_results
+from vis_infer_chunk_class_used_in_train import vis_infer_chunk
 from torch import optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm

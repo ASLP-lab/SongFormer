@@ -161,14 +161,14 @@ class Dataset(Dataset):
                 if not line:
                     continue
                 line_data = json.loads(line)
-                hybrid_id = internal_tmp_id + "_" + line_data["data_id"]
-                self.time_datas[hybrid_id] = [x[0] for x in line_data["msa_info"]]
+                hybrid_id = internal_tmp_id + "_" + line_data["id"]
+                self.time_datas[hybrid_id] = [x[0] for x in line_data["labels"]]
                 self.time_datas[hybrid_id] = list(
                     map(float, self.time_datas[hybrid_id])
                 )
                 self.label_datas[hybrid_id] = [
                     -1 if x[1] == "end" else self.label_to_id[x[1]]
-                    for x in line_data["msa_info"]
+                    for x in line_data["labels"]
                 ]
 
     def __len__(self):

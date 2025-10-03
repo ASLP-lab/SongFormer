@@ -86,7 +86,7 @@ class GeminiOnlyLabelAdapter(DatasetAdapter):
         rng = random.Random(42)
         rng.shuffle(self.valid_data_ids)
         for item in data:
-            self.id2segments[item["data_id"]] = item["msa_info"]
+            self.id2segments[item["id"]] = item["labels"]
 
     def get_ids_from_dir(self, dir_path: str):
         ids = os.listdir(dir_path)

@@ -84,3 +84,5 @@ vmo==0.30.5
 gradio
 einops
 beartype
+blessed
+PyPDF2
