@@ -26,7 +26,19 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 
 ![](figs/songformer.png)
 
-## News and Updates
+## 📢 News and Updates
+
+🔥 **October 3, 2025**  
+**Open-sourced Training and Evaluation Code** – We have released the full training and evaluation code to support and promote community development and further research.
+
+🔥 **October 2, 2025**  
+**One-Click Inference on Hugging Face Launched** – Successfully deployed our one-click inference feature on the Hugging Face platform, making model testing and usage more accessible and user-friendly.
+
+🔥 **September 30, 2025**  
+**SongFormer Inference Package Released** – The complete SongFormer inference code and pre-trained checkpoint models are now publicly available for download and use.
+
+🔥 **September 26, 2025**  
+**SongFormerDB and SongFormerBench Launched** – We introduced our large-scale music dataset **SongFormerDB** and comprehensive benchmark suite **SongFormerBench**, both now available on Hugging Face to facilitate research and evaluation in Music structure analysis.
 
 ## 📋 To-Do List
 
@@ -35,8 +47,8 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 - [x] Upload the paper to arXiv
 - [x] Fix readme
 - [x] Deploy an out-of-the-box inference version on Hugging Face (via Inference API or Spaces)
-- [ ] Open-source evaluation code
-- [ ] Open-source training code
+- [x] Open-source evaluation code
+- [x] Open-source training code
 
 ## Installation
 
@@ -137,6 +149,60 @@ You can control which GPUs are used by setting the `CUDA_VISIBLE_DEVICES` enviro
 > Notes
 > - You may need to modify line 121 in `src/third_party/musicfm/model/musicfm_25hz.py` to:
 > `S = torch.load(model_path, weights_only=False)["state_dict"]`
+
+## Evaluation
+
+### 1. Preparing MSA TXT Format for GT Annotations and Inference Results
+
+The MSA TXT file format follows this structure:
+
+```
+start_time_1 label_1
+start_time_2 label_2
+....
+end_time end
+```
+
+Each line contains two space-separated elements:
+
+- **First element**: Timestamp in seconds (float type)
+- **Second element**: Label (string type)
+
+**Conversion Notes:**
+
+- **SongFormer outputs** can be converted using the utility script `src/SongFormer/utils/convert_res2msa_txt.py`
+- **Other annotation tools** require custom conversion to this format
+- All MSA TXT files should be stored in a folder with **consistent naming** between ground truth (GT) and inference results
+
+### 2. Supported Labels and Definitions
+
+| ID   | Label      | Description                                                  |
+| ---- | ---------- | ------------------------------------------------------------ |
+| 0    | intro      | Opening section, typically appears at the beginning, rarely in middle or end |
+| 1    | verse      | Main narrative section with similar melody but different lyrics across repetitions; emotionally moderate, storytelling-focused |
+| 2    | chorus     | Climactic, highly repetitive section that forms the song's memorable hook; features diverse instrumentation and elevated energy |
+| 3    | bridge     | Contrasting section appearing once after 2-3 choruses, providing variation before returning to verse or chorus |
+| 4    | inst       | Instrumental section with minimal or no vocals, occasionally featuring speech elements |
+| 5    | outro      | Closing section, typically at the end, rarely appearing in beginning or middle |
+| 6    | silence    | Silent segments, usually before intro or after outro         |
+| 26   | pre-chorus | Transitional section between verse and chorus, featuring additional instruments and building emotional intensity |
+| -    | end        | Timestamp marker for song conclusion (not a label)           |
+
+**Important Note**: While our model generates 8 categories, mainstream evaluation uses 7 categories. During evaluation, `pre-chorus` labels are mapped to `verse` according to our mapping rules.
+
+### 3. Running the Evaluation
+
+The main evaluation script is located at `src/SongFormer/evaluation/eval_infer_results.py`. You can use the shell script `src/SongFormer/eval.sh` for streamlined evaluation.
+
+#### Parameter Configuration
+
+| Parameter                   | Description                                                  | Default Setting |
+| --------------------------- | ------------------------------------------------------------ | --------------- |
+| `ann_dir`                   | Ground truth directory                                       | Required        |
+| `est_dir`                   | Inference results directory                                  | Required        |
+| `output_dir`                | Output directory for evaluation results                      | Required        |
+| `prechorus2what`            | Mapping strategy for `pre-chorus` labels:• `verse`: Map to verse• `chorus`: Map to chorus• None: Keep original | Map to `verse`  |
+| `merge_continuous_segments` | Merge consecutive segments with identical labels             | Disabled        |
 
 ## Training
 
