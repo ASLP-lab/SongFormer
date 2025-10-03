@@ -26,7 +26,19 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 
 ![](figs/songformer.png)
 
-## News and Updates
+## 📢 News and Updates
+
+🔥 **October 3, 2025**  
+**Open-sourced Training and Evaluation Code** – We have released the full training and evaluation code to support and promote community development and further research.
+
+🔥 **October 2, 2025**  
+**One-Click Inference on Hugging Face Launched** – Successfully deployed our one-click inference feature on the Hugging Face platform, making model testing and usage more accessible and user-friendly.
+
+🔥 **September 30, 2025**  
+**SongFormer Inference Package Released** – The complete SongFormer inference code and pre-trained checkpoint models are now publicly available for download and use.
+
+🔥 **September 26, 2025**  
+**SongFormerDB and SongFormerBench Launched** – We introduced our large-scale music dataset **SongFormerDB** and comprehensive benchmark suite **SongFormerBench**, both now available on Hugging Face to facilitate research and evaluation in Music structure analysis.
 
 ## 📋 To-Do List
 
@@ -35,8 +47,8 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 - [x] Upload the paper to arXiv
 - [x] Fix readme
 - [x] Deploy an out-of-the-box inference version on Hugging Face (via Inference API or Spaces)
-- [ ] Open-source evaluation code
-- [ ] Open-source training code
+- [x] Open-source evaluation code
+- [x] Open-source training code
 
 ## Installation
 
