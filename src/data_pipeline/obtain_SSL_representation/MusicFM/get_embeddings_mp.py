@@ -46,10 +46,10 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
     musicfm = MusicFM25Hz(
         is_flash=False,
         stat_path=os.path.join(
-            "..", "third_party", "musicfm", "data", "msd_stats.json"
+            "..", "SongFormer", "ckpts", "MusicFM", "msd_stats.json"
         ),
         model_path=os.path.join(
-            "..", "third_party", "musicfm", "data", "pretrained_msd.pt"
+            "..", "SongFormer", "ckpts", "MusicFM", "pretrained_msd.pt"
         ),
     )
     musicfm = musicfm.to(device)
@@ -89,7 +89,7 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
 
                     _, hidden_states = musicfm.get_predictions(audio_seg)
 
-                    for j in [2, 4, 6, 8]:
+                    for j in [10]:
                         os.makedirs(
                             os.path.join(output_dir, f"layer_{j}"), exist_ok=True
                         )
