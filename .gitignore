@@ -50,3 +50,5 @@ cython_debug/
 # Other custom ignore rules
 *.bak
 *.swp
+
+.ruff_cache/
