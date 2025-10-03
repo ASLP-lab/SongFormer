@@ -206,7 +206,76 @@ The main evaluation script is located at `src/SongFormer/evaluation/eval_infer_r
 
 ## Training
 
-comming soon
+Before starting, ensure you have the necessary dependencies installed and your environment properly configured.
+
+### Step 1: Extract SSL Representations
+
+The SSL representation extraction code is located in `src/data_pipeline`. Navigate to this directory first:
+
+```bash
+cd src/data_pipeline
+```
+
+For each song, you need to extract 4 different representations:
+
+- **MuQ - 30s**: Short-term features with 30-second windows
+- **MuQ - 420s**: Long-term features with 420-second windows
+- **MusicFM - 30s**: Short-term features with 30-second windows
+- **MusicFM - 420s**: Long-term features with 420-second windows
+
+For 30-second representations, the extraction process employs a window size and hop size of 30 seconds, with features concatenated after extraction, resulting in a sequence length matching that of the 420-second version.
+
+Run the following scripts after configuring them for your environment:
+
+```bash
+# MuQ representations
+bash obtain_SSL_representation/MuQ/get_embeddings_30s_wrap420s.sh
+bash obtain_SSL_representation/MuQ/get_embeddings.sh
+
+# MusicFM representations  
+bash obtain_SSL_representation/MusicFM/get_embeddings_mp_30s_wrap420s.sh
+bash obtain_SSL_representation/MusicFM/get_embeddings_mp.sh
+```
+
+### Step 2: Configure Training Parameters
+
+Edit `src/SongFormer/configs/SongFormer.yaml` to set:
+
+- `train_dataset`: Training dataset configuration
+- `eval_dataset`: Evaluation dataset configuration
+- `args`: Model settings and experiment name
+
+------
+
+For the `dataset_abstracts` class, configure these parameters:
+
+| Parameter             | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| `internal_tmp_id`     | Unique identifier for the dataset instance                   |
+| `dataset_type`        | Dataset ID from `src/SongFormer/dataset/label2id.py` (see `DATASET_LABEL_TO_DATASET_ID`) |
+| `input_embedding_dir` | Space-separated paths to four SSL representation folders     |
+| `label_path`          | Path to JSONL file with labels (see [example format](https://huggingface.co/datasets/ASLP-lab/SongFormDB/blob/main/data/Gem/SongFormDB-Gem.jsonl)) |
+| `split_ids_path`      | Text file with one ID per line specifying data to use (IDs not in this file will be ignored) |
+| `multiplier`          | Data balancing factor - repeats small datasets to match larger ones |
+
+-----
+
+Update `src/SongFormer/train/accelerate_config/single_gpu.yaml` with your desired accelerate settings, and configure `src/SongFormer/train.sh` accordingly:
+
+- Your Weights & Biases (wandb) API key
+- Other training-specific settings
+
+### Step 3: Run Training
+
+Navigate to the SongFormer directory and execute the training script:
+
+```bash
+cd src/SongFormer
+bash train.sh
+```
+
+- The relevant training dashboard will be displayed on `wandb`
+- Checkpoints will be located in `src/SongFormer/output`
 
 ## Citation
 
