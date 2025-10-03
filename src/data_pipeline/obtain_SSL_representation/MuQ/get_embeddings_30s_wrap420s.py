@@ -29,6 +29,8 @@ def get_processed_ids(output_path):
     Returns:
         set: The set of processed ids.
     """
+    if not os.path.exists(output_path):
+        return set()
     ids = os.listdir(output_path)
     ret = []
     for x in ids:

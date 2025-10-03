@@ -17,6 +17,8 @@ mp.set_start_method("spawn", force=True)  # 强制使用 spawn 模式
 
 
 def get_processed_ids(output_path):
+    if not os.path.exists(output_path):
+        return set()
     ids = os.listdir(output_path)
     ret = []
     for x in ids:
