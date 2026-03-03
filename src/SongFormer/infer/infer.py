@@ -25,6 +25,25 @@ from tqdm import tqdm
 
 mp.set_start_method("spawn", force=True)
 
+
+def get_device(device_override=None, rank=0):
+    """Select the best available device: MPS (Apple Silicon), CUDA, or CPU."""
+    if device_override:
+        return torch.device(device_override)
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    if torch.cuda.is_available():
+        return torch.device(f"cuda:{rank}")
+    return torch.device("cpu")
+
+
+def clear_device_cache(device):
+    """Clear GPU memory cache for the given device type."""
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+    elif device.type == "mps":
+        torch.mps.empty_cache()
+
 MUSICFM_HOME_PATH = os.path.join("ckpts", "MusicFM")
 
 BEFORE_DOWNSAMPLING_FRAME_RATES = 25
@@ -115,7 +134,7 @@ def rule_post_processing(msa_list):
 
 def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
     """Run inference on the input audio"""
-    device = f"cuda:{rank}"
+    device = get_device(getattr(args, 'device', None), rank)
 
     # MuQ model loading (this will automatically fetch the checkpoint from huggingface)
     muq = MuQ.from_pretrained("OpenMuQ/MuQ-large-msd-iter")
@@ -199,7 +218,7 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
                     muq_output = muq(audio_seg.unsqueeze(0), output_hidden_states=True)
                     muq_embd_420s = muq_output["hidden_states"][10]
                     del muq_output
-                    torch.cuda.empty_cache()
+                    clear_device_cache(device)
 
                     # MusicFM embedding
                     _, musicfm_hidden_states = musicfm.get_predictions(
@@ -207,7 +226,7 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
                     )
                     musicfm_embd_420s = musicfm_hidden_states[10]
                     del musicfm_hidden_states
-                    torch.cuda.empty_cache()
+                    clear_device_cache(device)
 
                     wraped_muq_embd_30s = []
                     wraped_musicfm_embd_30s = []
@@ -229,13 +248,13 @@ def inference(rank, queue_input: mp.Queue, queue_output: mp.Queue, args):
                                 output_hidden_states=True,
                             )["hidden_states"][10]
                         )
-                        torch.cuda.empty_cache()
+                        clear_device_cache(device)
                         wraped_musicfm_embd_30s.append(
                             musicfm.get_predictions(
                                 audio[start_idx_30s:end_idx_30s].unsqueeze(0)
                             )[1][10]
                         )
-                        torch.cuda.empty_cache()
+                        clear_device_cache(device)
 
                     wraped_muq_embd_30s = torch.concatenate(wraped_muq_embd_30s, dim=1)
                     wraped_musicfm_embd_30s = torch.concatenate(
@@ -368,6 +387,7 @@ def main(args):
         checkpoint=args.checkpoint,
         config_path=args.config_path,
         no_rule_post_processing=args.no_rule_post_processing,
+        device=getattr(args, 'device', None),
     )
 
     processes = []
@@ -433,6 +453,7 @@ if __name__ == "__main__":
         help="Disable rule-based post-processing",
     )
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    parser.add_argument("--device", type=str, default=None, help="Force device (mps, cuda, cpu). Auto-detected if not set.")
 
     args = parser.parse_args()
 
