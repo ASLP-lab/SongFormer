@@ -148,8 +148,6 @@ We've achieved **breakthrough performance** in music structure analysis, setting
 | SongFormer (HX+E+H)   | 0.890     | **0.690** | 0.852     |
 | SongFormer (HX+E+H+G) | **0.891** | 0.688     | 0.851     |
 
-- Results marked with * are taken from original papers due to unavailable implementations
-- Dataset abbreviations: HX (HarmonixSet), E, H, G refer to different training datasets as stated in the paper
 
 #### RWC-Pop
 
@@ -166,6 +164,8 @@ We've achieved **breakthrough performance** in music structure analysis, setting
 | SongFormer (HX+E+H)      | **0.814** | 0.650     | **0.804** |
 | SongFormer (HX+E+H+G)    | 0.812     | 0.650     | 0.800     |
 
+- Results marked with * are taken from original papers due to unavailable implementations
+- Dataset abbreviations: HX (HarmonixSet), E, H, G refer to different training datasets as stated in the paper
 
 ## Installation
 
