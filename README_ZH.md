@@ -39,20 +39,22 @@
 
 <div align="center">
   <h3>
-    Chunbo Hao<sup>1*</sup>, Ruibin Yuan<sup>2,5*</sup>, Jixun Yao<sup>1</sup>, Qixin Deng<sup>3,5</sup>,<br>Xinyi Bai<sup>4,5</sup>, Wei Xue<sup>2</sup>, Lei Xie<sup>1†</sup>
+    Chunbo Hao<sup>1*</sup>, Ruibin Yuan<sup>2,6*</sup>, Jixun Yao<sup>1</sup>, Qixin Deng<sup>3,6</sup>,<br>Xinyi Bai<sup>4,6</sup>, Yanbo Wang<sup>5</sup>, Wei Xue<sup>2</sup>, Lei Xie<sup>1†</sup>
   </h3>
-  
+
+
   <p>
     <sup>*</sup>Equal contribution &nbsp;&nbsp; <sup>†</sup>Corresponding author
   </p>
-  
   <p>
-    <sup>1</sup>Audio, Speech and Language Processing Group (ASLP@NPU),<br>Northwestern Polytechnical University<br>
+    <sup>1</sup>Audio, Speech and Language Processing Group (ASLP@NPU),<br>School of Computer Science, Northwestern Polytechnical University<br>
     <sup>2</sup>Hong Kong University of Science and Technology<br>
     <sup>3</sup>Northwestern University<br>
     <sup>4</sup>Cornell University<br>
-    <sup>5</sup>Multimodal Art Projection (M-A-P)
+    <sup>5</sup>University of New South Wales<br>
+    <sup>6</sup>Multimodal Art Projection (M-A-P)
   </p>
+
 </div>
 
 ----
@@ -73,8 +75,8 @@ SongFormer 是一种音乐结构分析框架，利用多分辨率的自监督表
 🔥 **2025年9月30日**
 **发布 SongFormer 推理包** – SongFormer 的完整推理代码和预训练模型Checkpoint现已公开发布，可供下载和使用。
 
-🔥 **2025年9月26日**
-**发布 SongFormDB 与 SongFormBench** – 我们推出了大规模音乐数据集 **SongFormDB** 和综合评测基准 **SongFormBench**，均已上线 Hugging Face，助力音乐结构分析的研究与评估。
+🔥 **2025年9月26日**  
+**SongFormDB 与 SongFormBench 发布** – 我们推出了大规模音乐数据集 **SongFormDB** 和综合基准测试套件 **SongFormBench**，两者现已在 Hugging Face 上线，以促进音乐结构分析领域的研究与评估。
 
 ## 🚀 快速开始
 
@@ -129,8 +131,8 @@ SongFormer 是一种音乐结构分析框架，利用多分辨率的自监督表
 | Gemini 2.5 Pro          | 0.748     | 0.423     | **0.813** |
 | **SongFormer**    |           |           |           |
 | SongFormer (HX)         | 0.795     | **0.703** | 0.784     |
-| SongFormer (HX+P+H)     | 0.806     | 0.697     | 0.780     |
-| SongFormer (HX+P+H+G)   | **0.807** | 0.696     | 0.780     |
+| SongFormer (HX+E+H)      | 0.806     | 0.697     | 0.780     |
+| SongFormer (HX+E+H+G)    | **0.807** | 0.696     | 0.780     |
 
 #### SongFormBench-CN
 
@@ -142,11 +144,28 @@ SongFormer 是一种音乐结构分析框架，利用多分辨率的自监督表
 | Gemini 2.5 Pro          | 0.806     | 0.412     | 0.833     |
 | **SongFormer**    |           |           |           |
 | SongFormer (HX)         | 0.848     | 0.675     | **0.856** |
-| SongFormer (HX+P+H)     | 0.890     | **0.690** | 0.852     |
-| SongFormer (HX+P+H+G)   | **0.891** | 0.688     | 0.851     |
+| SongFormer (HX+E+H)   | 0.890     | **0.690** | 0.852     |
+| SongFormer (HX+E+H+G) | **0.891** | 0.688     | 0.851     |
+
+
+#### RWC-Pop
+
+| 方法                   | ACC       | HR.5F     | HR3F      |
+| ------------------------ | --------- | --------- | --------- |
+| **基线方法**     |           |           |           |
+| Harmonic-CNN*            | 0.646     | 0.571     | —         |
+| SpecTNT (24 s, CTL)*     | 0.675     | 0.623     | —         |
+| MusicFM-Zhang et al.*    | 0.680     | 0.636     | 0.764     |
+| LinkSeg                  | 0.747     | 0.648     | 0.786     |
+| TA (Zhang et al., 2025)* | 0.779     | 0.506     | 0.691     |
+| **SongFormer**    |           |           |           |
+| SongFormer (HX)          | 0.787     | **0.651** | 0.795     |
+| SongFormer (HX+E+H)      | **0.814** | 0.650     | **0.804** |
+| SongFormer (HX+E+H+G)    | 0.812     | 0.650     | 0.800     |
 
 - 标记 * 的结果因无法获取实现而引自原论文
-- 数据集缩写说明：HX (HarmonixSet)，P、H、G代表论文中所声明的不同训练数据集
+- 数据集缩写：HX（HarmonixSet），E、H、G指代论文中所述的不同训练数据集
+
 
 ## 安装
 
@@ -379,14 +398,14 @@ bash train.sh
 如果本项目对您的研究有所帮助，请引用以下内容：
 
 ````bibtex
-@misc{hao2025songformer,
-  title         = {SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision},
-  author        = {Chunbo Hao and Ruibin Yuan and Jixun Yao and Qixin Deng and Xinyi Bai and Wei Xue and Lei Xie},
-  year          = {2025},
-  eprint        = {2510.02797},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.AS},
-  url           = {https://arxiv.org/abs/2510.02797}
+@misc{hao2026songformerscalingmusicstructure,
+      title={SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision}, 
+      author={Chunbo Hao and Ruibin Yuan and Jixun Yao and Qixin Deng and Xinyi Bai and Yanbo Wang and Wei Xue and Lei Xie},
+      year={2026},
+      eprint={2510.02797},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2510.02797}, 
 }
 ````
 
