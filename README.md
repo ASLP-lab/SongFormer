@@ -40,20 +40,22 @@
 
 <div align="center">
   <h3>
-    Chunbo Hao<sup>1*</sup>, Ruibin Yuan<sup>2,5*</sup>, Jixun Yao<sup>1</sup>, Qixin Deng<sup>3,5</sup>,<br>Xinyi Bai<sup>4,5</sup>, Wei Xue<sup>2</sup>, Lei Xie<sup>1†</sup>
+    Chunbo Hao<sup>1*</sup>, Ruibin Yuan<sup>2,6*</sup>, Jixun Yao<sup>1</sup>, Qixin Deng<sup>3,6</sup>,<br>Xinyi Bai<sup>4,6</sup>, Yanbo Wang<sup>5</sup>, Wei Xue<sup>2</sup>, Lei Xie<sup>1†</sup>
   </h3>
-  
+
+
   <p>
     <sup>*</sup>Equal contribution &nbsp;&nbsp; <sup>†</sup>Corresponding author
   </p>
-  
   <p>
-    <sup>1</sup>Audio, Speech and Language Processing Group (ASLP@NPU),<br>Northwestern Polytechnical University<br>
+    <sup>1</sup>Audio, Speech and Language Processing Group (ASLP@NPU),<br>School of Computer Science, Northwestern Polytechnical University<br>
     <sup>2</sup>Hong Kong University of Science and Technology<br>
     <sup>3</sup>Northwestern University<br>
     <sup>4</sup>Cornell University<br>
-    <sup>5</sup>Multimodal Art Projection (M-A-P)
+    <sup>5</sup>University of New South Wales<br>
+    <sup>6</sup>Multimodal Art Projection (M-A-P)
   </p>
+
 </div>
 
 ----
@@ -76,7 +78,7 @@ SongFormer is a music structure analysis framework that leverages multi-resoluti
 **SongFormer Inference Package Released** – The complete SongFormer inference code and pre-trained checkpoint models are now publicly available for download and use.
 
 🔥 **September 26, 2025**  
-**SongFormerDB and SongFormerBench Launched** – We introduced our large-scale music dataset **SongFormerDB** and comprehensive benchmark suite **SongFormerBench**, both now available on Hugging Face to facilitate research and evaluation in Music structure analysis.
+**SongFormDB and SongFormBench Launched** – We introduced our large-scale music dataset **SongFormDB** and comprehensive benchmark suite **SongFormBench**, both now available on Hugging Face to facilitate research and evaluation in Music structure analysis.
 
 ## 🚀 QuickStart
 
@@ -123,7 +125,6 @@ We've achieved **breakthrough performance** in music structure analysis, setting
 | SpecTNT (24s)*           | 0.701     | 0.570     | —         |
 | SpecTNT (36s)*           | 0.723     | 0.558     | —         |
 | All-In-One               | 0.740     | 0.596     | 0.730     |
-| MERT (5s)*               | 0.574     | 0.626     | —         |
 | MusicFM-Zhang et al.*    | 0.725     | 0.640     | 0.729     |
 | MuQ_iter*                | 0.772     | —         | —         |
 | LinkSeg-7Labels          | 0.780     | 0.630     | 0.762     |
@@ -131,8 +132,8 @@ We've achieved **breakthrough performance** in music structure analysis, setting
 | Gemini 2.5 Pro           | 0.748     | 0.423     | **0.813** |
 | **SongFormer (Ours)**    |           |           |           |
 | SongFormer (HX)          | 0.795     | **0.703** | 0.784     |
-| SongFormer (HX+P+H)      | 0.806     | 0.697     | 0.780     |
-| SongFormer (HX+P+H+G)    | **0.807** | 0.696     | 0.780     |
+| SongFormer (HX+E+H)      | 0.806     | 0.697     | 0.780     |
+| SongFormer (HX+E+H+G)    | **0.807** | 0.696     | 0.780     |
 
 #### SongFormBench-CN
 
@@ -144,11 +145,27 @@ We've achieved **breakthrough performance** in music structure analysis, setting
 | Gemini 2.5 Pro        | 0.806     | 0.412     | 0.833     |
 | **SongFormer (Ours)** |           |           |           |
 | SongFormer (HX)       | 0.848     | 0.675     | **0.856** |
-| SongFormer (HX+P+H)   | 0.890     | **0.690** | 0.852     |
-| SongFormer (HX+P+H+G) | **0.891** | 0.688     | 0.851     |
+| SongFormer (HX+E+H)   | 0.890     | **0.690** | 0.852     |
+| SongFormer (HX+E+H+G) | **0.891** | 0.688     | 0.851     |
 
 - Results marked with * are taken from original papers due to unavailable implementations
-- Dataset abbreviations: HX (HarmonixSet), P, H, G refer to different training datasets as stated in the paper
+- Dataset abbreviations: HX (HarmonixSet), E, H, G refer to different training datasets as stated in the paper
+
+#### RWC-Pop
+
+| Method                   | ACC       | HR.5F     | HR3F      |
+| ------------------------ | --------- | --------- | --------- |
+| **Baseline Methods**     |           |           |           |
+| Harmonic-CNN*            | 0.646     | 0.571     | —         |
+| SpecTNT (24 s, CTL)*     | 0.675     | 0.623     | —         |
+| MusicFM-Zhang et al.*    | 0.680     | 0.636     | 0.764     |
+| LinkSeg                  | 0.747     | 0.648     | 0.786     |
+| TA (Zhang et al., 2025)* | 0.779     | 0.506     | 0.691     |
+| **SongFormer (Ours)**    |           |           |           |
+| SongFormer (HX)          | 0.787     | **0.651** | 0.795     |
+| SongFormer (HX+E+H)      | **0.814** | 0.650     | **0.804** |
+| SongFormer (HX+E+H+G)    | 0.812     | 0.650     | 0.800     |
+
 
 ## Installation
 
@@ -382,14 +399,14 @@ bash train.sh
 If our work and codebase is useful for you, please cite as:
 
 ````bibtex
-@misc{hao2025songformer,
-  title         = {SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision},
-  author        = {Chunbo Hao and Ruibin Yuan and Jixun Yao and Qixin Deng and Xinyi Bai and Wei Xue and Lei Xie},
-  year          = {2025},
-  eprint        = {2510.02797},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.AS},
-  url           = {https://arxiv.org/abs/2510.02797}
+@misc{hao2026songformerscalingmusicstructure,
+      title={SongFormer: Scaling Music Structure Analysis with Heterogeneous Supervision}, 
+      author={Chunbo Hao and Ruibin Yuan and Jixun Yao and Qixin Deng and Xinyi Bai and Yanbo Wang and Wei Xue and Lei Xie},
+      year={2026},
+      eprint={2510.02797},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2510.02797}, 
 }
 ````
 
@@ -411,5 +428,3 @@ We look forward to hearing from you!
         <img src="figs/aslp.png" width="400"/>
     </a>
 </p>
-
-
